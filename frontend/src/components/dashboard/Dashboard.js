@@ -18,7 +18,7 @@ import {
   DialogContentText,
   DialogActions,
 } from '@mui/material';
-import axios from 'axios';
+import api from '../../config/axios';
 
 const Dashboard = () => {
   const [posts, setPosts] = useState([]);
@@ -34,14 +34,8 @@ const Dashboard = () => {
 
   const fetchPosts = async () => {
     try {
-      const config = {
-        headers: {
-          'x-auth-token': localStorage.getItem('token'),
-        },
-      };
-
       console.log('Fetching posts with token:', localStorage.getItem('token'));
-      const res = await axios.get('/api/posts/user', config);
+      const res = await api.get('/api/posts/user');
       console.log('Posts response:', res.data);
       setPosts(res.data);
       setLoading(false);
@@ -59,13 +53,7 @@ const Dashboard = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      const config = {
-        headers: {
-          'x-auth-token': localStorage.getItem('token'),
-        },
-      };
-
-      await axios.delete(`/api/posts/${postToDelete._id}`, config);
+      await api.delete(`/api/posts/${postToDelete._id}`);
       setPosts(posts.filter((post) => post._id !== postToDelete._id));
       setDeleteDialogOpen(false);
       setPostToDelete(null);

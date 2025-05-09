@@ -11,7 +11,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import MDEditor from '@uiw/react-md-editor';
-import axios from 'axios';
+import api from '../../config/axios';
 
 const PostForm = () => {
   const [formData, setFormData] = useState({
@@ -27,12 +27,7 @@ const PostForm = () => {
     const fetchPost = async () => {
       if (id) {
         try {
-          const config = {
-            headers: {
-              'x-auth-token': localStorage.getItem('token'),
-            },
-          };
-          const res = await axios.get(`/api/posts/${id}`, config);
+          const res = await api.get(`/api/posts/${id}`);
           setFormData({
             title: res.data.title,
             content: res.data.content,
@@ -55,17 +50,11 @@ const PostForm = () => {
     setError('');
 
     try {
-      const config = {
-        headers: {
-          'x-auth-token': localStorage.getItem('token'),
-        },
-      };
-
       console.log('Creating post with data:', formData);
       if (id) {
-        await axios.put(`/api/posts/${id}`, formData, config);
+        await api.put(`/api/posts/${id}`, formData);
       } else {
-        const response = await axios.post('/api/posts', formData, config);
+        const response = await api.post('/api/posts', formData);
         console.log('Post creation response:', response.data);
       }
       navigate('/dashboard');
