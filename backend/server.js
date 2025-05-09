@@ -10,9 +10,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://personal-blog-mern.netlify.app/', 'http://localhost:3000'] 
-    : '*',
+  origin: ['https://personal-blog-mern.netlify.app/', 'http://localhost:3000'] ,
   credentials: true
 }));
 app.use(express.json());
