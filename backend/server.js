@@ -10,8 +10,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://personal-blog-mern.netlify.app/', 'http://localhost:3000'] ,
-  credentials: true
+  origin: ['https://personal-blog-mern.netlify.app', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'x-auth-token']
 }));
 app.use(express.json());
 
