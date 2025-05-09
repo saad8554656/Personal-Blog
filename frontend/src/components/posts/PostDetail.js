@@ -17,7 +17,7 @@ import {
   Avatar,
 } from '@mui/material';
 import MDEditor from '@uiw/react-md-editor';
-import axios from 'axios';
+import api from '../../config/axios';
 import { useAuth } from '../../context/AuthContext';
 
 const PostDetail = () => {
@@ -38,12 +38,7 @@ const PostDetail = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const config = {
-          headers: {
-            'x-auth-token': localStorage.getItem('token'),
-          },
-        };
-        const res = await axios.get(`/api/posts/${id}`, config);
+        const res = await api.get(`/api/posts/${id}`);
         setPost({
           ...res.data,
           comments: res.data.comments || []
@@ -62,16 +57,25 @@ const PostDetail = () => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
-        const config = {
-          headers: {
-            'x-auth-token': localStorage.getItem('token'),
-          },
-        };
-        await axios.delete(`/api/posts/${id}`, config);
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setError('Authentication required. Please log in again.');
+          return;
+        }
+
+        await api.delete(`/api/posts/${id}`);
         navigate('/dashboard');
       } catch (err) {
         console.error('Error deleting post:', err);
-        setError(err.response?.data?.message || 'Error deleting post');
+        if (err.response?.status === 401) {
+          setError('Authentication failed. Please log in again.');
+        } else if (err.response?.status === 403) {
+          setError('You are not authorized to delete this post.');
+        } else if (err.response?.status === 404) {
+          setError('Post not found.');
+        } else {
+          setError(err.response?.data?.message || 'Error deleting post. Please try again.');
+        }
       }
     }
   };
@@ -79,16 +83,7 @@ const PostDetail = () => {
   const handleComment = async (e) => {
     e.preventDefault();
     try {
-      const config = {
-        headers: {
-          'x-auth-token': localStorage.getItem('token'),
-        },
-      };
-      const res = await axios.post(
-        `/api/comments/${id}`,
-        { content: comment },
-        config
-      );
+      const res = await api.post(`/api/comments/${id}`, { content: comment });
       setPost(prevPost => ({
         ...prevPost,
         comments: [...(prevPost.comments || []), res.data]
